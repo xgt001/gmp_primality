@@ -82,7 +82,7 @@ bool flag = false;
 		k = 1;
 		for(;mpz_get_ui(n)<=limit;k++)
 		{	res = 0;
-			printf("here \n");
+			//printf("here \n");
 			mpz_powm(res.get_mpz_t(),n,k.get_mpz_t(),r);
 			if(res == 1)
 				goto STOP;
@@ -114,7 +114,7 @@ void totient_function(mpz_t n)
 	unsigned int intr = mpz_get_ui(r);
 	unsigned int a;
 
-	printf("Inside polynomial multiplication \n");
+	//printf("Inside polynomial multiplication \n");
 	for ( a = 1; a<=mpz_get_ui(poly_limit) ; a++)
 	{
 		
