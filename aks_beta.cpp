@@ -1,7 +1,3 @@
-//DEVELOPMENT MILESTONE FILES TO BE APPENDED HERE
-//NOT TO BE MESSED AROUND
-//		ganesh@techsplurge.com
-
 #include <stdio.h>
 #include <iostream>
 #include <gmp.h> 	//GMP
@@ -13,23 +9,41 @@ mpz_class k;
 mpz_class res;
 mpz_t n,r;
 mpz_class logn,limit ;
+time_t start,stop;
 void logfunc(mpz_t n);
 int power_check(mpz_t n);
 void order_of_modulo(mpz_t n); //we are implementing step 2,3,4 here; 
 void totient_function(mpz_t n); //final polynomial multiplication for AKS
+void timeend(void)
+{
+	stop = clock();
+	cout << "Time clock() = " << (stop - start)/(double)CLOCKS_PER_SEC << endl;
+
+}
+
 int main()
 {
+	start = clock();
 	mpz_init(r);
 	mpz_set_ui(r,2);
 	mpz_inp_str (n,stdin,10);
-
+	atexit(timeend);
+	if(mpz_cmp_ui(n,3)==0||mpz_cmp_ui(n,5)==0)
+	{
+		printf("Prime \n");
+		exit(EXIT_SUCCESS);
+	}	
 	if(power_check(n)!=0)
 	{
 		printf("Composite and Perfect Square \n");
+		exit(EXIT_SUCCESS);
 	}
-	//printf("PASS1 CLEAR \n");
+	
 	logfunc(n);
-	order_of_modulo(n);
+	//a nasty optimization hack to improve speeds... 
+	//order of modulo function spends more than necessary time to evaluate R otherwise
+	if(mpz_sizeinbase(n,10)<6)
+		order_of_modulo(n);
 	totient_function(n);
 	return 0;
 }
@@ -40,7 +54,6 @@ void logfunc(mpz_t n)
 	limit = logn * logn ;
 }
 
-//fix it to other return type, later to do
 int power_check(mpz_t n)
 {
 	mpz_t op;
@@ -59,16 +72,17 @@ mpz_class res,k;
  
 bool flag = false;
 	while(mpz_cmp(r,n) == -1)
-	{
+	{	
 		if(mpz_divisible_p(n,r)!=0)  //essentially step 3 of the ALGO
 		{
-			//printf("Divisible by %ld \n",mpz_get_ui(r)); 
-			printf("Divisible\n");
+			printf("Divisible by %ld \n",mpz_get_ui(r)); 
+			//printf("Divisible\n");
 			exit(EXIT_SUCCESS);
 		}
 		k = 1;
 		for(;mpz_get_ui(n)<=limit;k++)
 		{	res = 0;
+			printf("here \n");
 			mpz_powm(res.get_mpz_t(),n,k.get_mpz_t(),r);
 			if(res == 1)
 				goto STOP;
@@ -77,9 +91,9 @@ bool flag = false;
 
 	}
 STOP : printf("");
-//mpz_out_str(stdout,10,r);
+mpz_out_str(stdout,10,r);
 //printf("\n");
-
+printf("Here \n");
 if(mpz_cmp(r,n)==0)
 {
 	printf(" N is prime, detected in Phase 2 \n");
@@ -116,6 +130,8 @@ void totient_function(mpz_t n)
 		base.setCoef(1,1);
 		mpz_class kk(n);
 		mpz_pX_mod_power(res,base,kk,kk,intr);
+	//	printf("Here \n");
+
 		if(!res.isEqual(compare)){
 				printf("Found Composite \n");
 				exit(EXIT_SUCCESS);
@@ -124,4 +140,5 @@ void totient_function(mpz_t n)
 	}
 
 printf("Found Prime \n");
+exit(EXIT_SUCCESS);
 }
